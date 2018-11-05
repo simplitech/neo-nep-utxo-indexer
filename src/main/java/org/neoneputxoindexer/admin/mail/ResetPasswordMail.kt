@@ -1,0 +1,17 @@
+package org.neoneputxoindexer.admin.mail
+
+import org.neoneputxoindexer.AppMail
+import org.neoneputxoindexer.model.User
+import br.com.simpli.model.LanguageHolder
+
+class ResetPasswordMail(appUrl: String, lang: LanguageHolder, user: User, hash: String) : AppMail(appUrl, lang) {
+    init {
+        this.to = user.email!!
+        this.subject = "Password Recovery"
+
+        data.put("linkUrl", """$appUrl/#/password/recover/$hash""")
+        data.put("linkUnsubscribeUrl", "#")
+
+        setBodyFromTemplate(this::class.java, data, "forgotPassword.html")
+    }
+}
