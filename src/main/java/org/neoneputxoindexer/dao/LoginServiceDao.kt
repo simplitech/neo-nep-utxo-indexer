@@ -30,7 +30,7 @@ class LoginServiceDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
             """, { rs -> Admin.buildAll(rs) }, idAdminPk)
     }
 
-    fun getUserByEmail(email: String?): User? {
+    fun getUserByEmail(email: String?): Admin? {
         //TODO: review generated method
         return selectOne("""
             SELECT *

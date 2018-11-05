@@ -188,7 +188,7 @@ UNLOCK TABLES;
 LOCK TABLES `transaction` WRITE;
 
 INSERT INTO `transaction`
-(idTransactionPk,hash,idTypeFk,from,idBlockFk)
+(idTransactionPk,`hash`,idTypeFk,`from`,idBlockFk)
 VALUES
 (1,'Iusto aut dolores voluptatem suscipit.',1,'Cumque dolores commodi quos omnis est molestias ut ea fuga.',1),
 (2,'Reiciendis fugit mollitia commodi qui necessitatibus atque.',30,'Quod vitae omnis nesciunt.',40),
@@ -246,7 +246,7 @@ UNLOCK TABLES;
 LOCK TABLES `transaction_input` WRITE;
 
 INSERT INTO `transaction_input`
-(idTransactionInputPk,previousIdTransactionFk,idTransactionFk,amount,spent,to,idAssetFk)
+(idTransactionInputPk,previousIdTransactionFk,idTransactionFk,amount,spent,`to`,idAssetFk)
 VALUES
 (1,1,1,389,1,'Placeat numquam similique qui possimus aliquid ut aliquam et.',1),
 (2,20,35,730,0,'Sapiente nam eos et nihil nulla quia sint.',10),
