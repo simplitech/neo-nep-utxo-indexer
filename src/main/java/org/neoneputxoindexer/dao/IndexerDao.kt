@@ -6,7 +6,7 @@ import java.sql.Connection
 
 class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
     fun hasTransaction(transactionHash: String): Boolean {
-        return  exist("SELECT transactionHash FROM transactions WHERE transactionHash = ?", transactionHash)
+        return  exist("SELECT invocationTransactionHash FROM transaction WHERE invocationTransactionHash = ?", transactionHash)
     }
 
     fun insertNewRegularAccount(scriptHash: String) {
@@ -14,11 +14,19 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
     }
 
     fun insertTransaction(transactionHash: String) {
-        update("INSERT INTO transactions (transactionHash) VALUES (?)", transactionHash)
+        update("INSERT INTO transaction (invocationTransactionHash) VALUES (?)", transactionHash)
     }
 
     fun insertMint(masterAccount: String, mintAmount: Int, recipient: String, txHash: String) {
-        update("INSERT INTO transaction_mint_history (transactionHash, masterAccount, amount, recipient, date) VALUES (?,?,?,?,NOW())",
+        update("INSERT INTO transaction_mint_history (transactionHash, masterAccount, amount, recipient, dateTime) VALUES (?,?,?,?,NOW())",
                 txHash, masterAccount, mintAmount, recipient)
+    }
+
+    fun insertMasterAccount(masterAccount: String) {
+        update("INSERT INTO master_registration_history (masterAccount, dateTime) VALUES (?, NOW())", masterAccount)
+    }
+
+    fun insertRegularAccountApproval(masterAccount: String, regularAccount: String) {
+        update("INSERT INTO account_approvals_history  (masterAccount, regularAccount, dateTime) VALUES (?, ?, NOW())", masterAccount, regularAccount)
     }
 }

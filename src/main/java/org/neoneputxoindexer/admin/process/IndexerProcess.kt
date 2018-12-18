@@ -8,15 +8,16 @@ import java.sql.Connection
 import org.apache.commons.codec.binary.Hex
 import org.neoneputxoindexer.dao.IndexerDao
 import org.neoneputxoindexer.model.*
+import java.math.BigInteger
 import java.nio.ByteBuffer
 
 
 class IndexerProcess(private val con: Connection, private val lang: LanguageHolder) {
 
-    val apiPrefix : String = "http://chain.simpli.com.br:30333?jsonrpc=2.0"
-    val urlRpcGetBlock : String = apiPrefix.plus("&method=getblock&params=")
-    val urlRpcGetApplicationLogs : String = apiPrefix.plus("&method=getapplicationlog&params=")
-    val reversedScriptHash : String = "b43bc406d44c6db622b2dd2a5ee2cbc5672e4448";//Reverse your script hash here: neocompiler.io/#/ecolab/ ('conversors')
+    val apiPrefix = "http://chain.simpli.com.br:30333?jsonrpc=2.0"
+    val urlRpcGetBlock = apiPrefix.plus("&method=getblock&params=")
+    val urlRpcGetApplicationLogs = apiPrefix.plus("&method=getapplicationlog&params=")
+    val reversedScriptHash = "b43bc406d44c6db622b2dd2a5ee2cbc5672e4448";//Reverse your script hash here: neocompiler.io/#/ecolab/ ('conversors')
     var gson = Gson()
 
     fun rpcGetBlock(blockHeight : Int) : String
@@ -53,8 +54,7 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
                 val firstNotificationType = firstNotification.state.value[0]
                 if(firstNotificationType.type == "ByteArray")
                 {
-                    val notificationNameBytes = Hex.decodeHex(firstNotificationType.value.toCharArray())
-                    val notificationName = String(notificationNameBytes)
+                    val notificationName = LowLevelUtils.hex2str(firstNotificationType.value)
 
                     handleNotification(notificationName, firstNotification, notificationResponse.result.txid)
                     return notificationName
@@ -67,31 +67,36 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
     fun handleNotification(notificationName : String, notification: Notification, transactionHash: String)
     {
         val indexerDao = IndexerDao(con, lang)
-        if(!indexerDao.hasTransaction(transactionHash))
+        if (!indexerDao.hasTransaction(transactionHash))
         {
-            if(notificationName ==  "newRegularAccount")
-            {
-                val accountName = notification.state.value[1]
-                indexerDao.insertNewRegularAccount(accountName.value)
-            }else if(notificationName ==  "mint")
-            {
-                val masterAccount = notification.state.value[1]
-                val amount = notification.state.value[2]
-                val amountBytes = Hex.decodeHex(amount.value.toCharArray())
-                val wrapped = ByteBuffer.wrap(amountBytes)
-                val amountValue = wrapped.getInt()
-                val recipient = notification.state.value[3]
-                val txHash = notification.state.value[4]
-                indexerDao.insertMint(masterAccount.value, amountValue, recipient.value, txHash.value)
-            }else if(notificationName == "newMasterAccount")
-            {
+            when (notificationName) {
+                "newRegularAccount" -> {
+                    val accountName = notification.state.value[1]
+                    indexerDao.insertNewRegularAccount(accountName.value)
+                }
+                "mint" -> {
+                    val masterAccount = notification.state.value[1]
+                    val amount = notification.state.value[2]
+                    val amountValue = LowLevelUtils.hex2Int(amount.value)
+                    val recipient = notification.state.value[3]
+                    val txHash = notification.state.value[4]
+                    indexerDao.insertMint(masterAccount.value, amountValue, recipient.value, txHash.value)
+                }
+                "newMasterAccount" -> {
+                    val masterAccount = notification.state.value[1]
+                    indexerDao.insertMasterAccount(masterAccount.value)
+                }
+                "regularAccountApproved" -> {
+                    val masterAccount = notification.state.value[1]
+                    val regularAccount = notification.state.value[2]
+                    indexerDao.insertRegularAccountApproval(masterAccount.value, regularAccount.value)
+                }
+                "transferTransactions" -> {
+                    val sender = notification.state.value[1]
+                    val recipient = notification.state.value[2]
+                    val txHash = notification.state.value[3]
 
-            }else if(notificationName == "newRegularAccount")
-            {
-
-            }else if(notificationName == "regularAccountApproved")
-            {
-
+                }
             }
             indexerDao.insertTransaction(transactionHash)
         }
@@ -102,11 +107,11 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
     {
         val block = getBlock(block);
         block.result?.let{
-            for(transaction in it.tx)
+            for (transaction in it.tx)
             {
-                if(transaction.type == "InvocationTransaction")
+                if (transaction.type == "InvocationTransaction")
                 {
-                    if(transaction.script.endsWith(reversedScriptHash))
+                    if (transaction.script.endsWith(reversedScriptHash))
                     {
                         return true
                     }

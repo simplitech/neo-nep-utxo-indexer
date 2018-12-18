@@ -31,22 +31,47 @@ class IndexerTest : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
     }
 
     @Test
-    fun testGetNotifications()
+    fun testGetMintNotification()
     {
         val notifications = subject.getNotifications("ef8aa846da0bc05161aa9f6894e7bc8949968f8b5574d02d7cd4a636386a88a9");
         Assert.assertNotNull(notifications)
         val notType = subject.handleNotification(notifications)
-        con.commit()
-        print(notType)
+        Assert.assertEquals(notType, "mint")
     }
 
-//    constructor() : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
-//
-//
-//        @Test
-//        fun testIndexMint() {
-//
-//        }
-//
-//    }
+    @Test
+    fun testGetRegisterRegularAccountNotification()
+    {
+        val notifications = subject.getNotifications("5c3714db1aa986045d364f2c6ea4a7e963291e22294b02e66b1b2ff9fc592ae8");
+        Assert.assertNotNull(notifications)
+        val notType = subject.handleNotification(notifications)
+        Assert.assertEquals("newRegularAccount", notType)
+    }
+
+    @Test
+    fun testGetApproveRegularAccountNotification()
+    {
+        val notifications = subject.getNotifications("fad65dada508195495027e1a73136e1f0ac5df612e1000aff74d1d55013bdd11");
+        Assert.assertNotNull(notifications)
+        val notType = subject.handleNotification(notifications)
+        Assert.assertEquals("regularAccountApproved", notType)
+    }
+
+
+    @Test
+    fun testGetRegisterMasterAccountNotification()
+    {
+        val notifications = subject.getNotifications("7558b3c66f0ff2eb9cd42bf1c943adc1b1b13fb56acb7db8d0f405c7f4060d87");
+        Assert.assertNotNull(notifications)
+        val notType = subject.handleNotification(notifications)
+        Assert.assertEquals("newMasterAccount", notType)
+    }
+
+    @Test
+    fun testGetTransferNotification()
+    {
+
+    }
+
+
 }
