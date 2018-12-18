@@ -1,6 +1,5 @@
 package org.neoneputxoindexer
 
-import org.neoneputxoindexer.admin.AuthPipe
 import org.neoneputxoindexer.lang.EnUs
 import org.neoneputxoindexer.lang.PtBr
 import br.com.simpli.model.LanguageHolder
@@ -19,7 +18,6 @@ import javax.ws.rs.ext.ExceptionMapper
  */
 open class RouterWrapper : ExceptionMapper<Throwable> {
     protected var transacPipe = TransactionPipe("jdbc/neoIndexerDS")
-    protected var authPipe = AuthPipe(transacPipe)
 
     protected val langs: HashMap<String, LanguageHolder> = object : HashMap<String, LanguageHolder>() {
         init {
