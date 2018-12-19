@@ -72,7 +72,6 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
 
         if (!Strings.isNullOrEmpty(query)) {
             where += ("""
-                AND dateTime >= ? AND dateTime <= ?
                 AND LOWER(CONCAT(
                 IFNULL(transfer_history.transactionHash, ''),
                 IFNULL(transfer_history.recipient, ''),
@@ -81,6 +80,16 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
                 )) LIKE LOWER(?)
                 """)
             params.add("%$query%")
+        }
+
+        if (startDate != null) {
+            where += " AND dateTime >= ? "
+            params.add(startDate)
+        }
+
+        if (endDate != null) {
+            where += " AND dateTime <= ? "
+            params.add(endDate)
         }
 
         var limitQuery = ""
