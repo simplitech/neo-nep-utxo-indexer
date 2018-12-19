@@ -44,9 +44,9 @@ class Router : RouterWrapper() {
             orderRequest: String?,
         @QueryParam("ascending") @ApiParam(value = "True for ascending order", defaultValue = "false")
         asc: Boolean?,
-        @QueryParam("startDate") @ApiParam(value = "Starting from", defaultValue = "2018-10-19")
+        @QueryParam("startDate") @ApiParam(value = "Starting from", example = "2018-10-19")
         startDate: Date?,
-        @QueryParam("endDate") @ApiParam(value = "Ending in", defaultValue = "2018-10-25")
+        @QueryParam("endDate") @ApiParam(value = "Ending in", example = "2018-10-25")
         endDate: Date?
     ): PagedResp<TransferTransaction> {
         return transacPipe.handle {
