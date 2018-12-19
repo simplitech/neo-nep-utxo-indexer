@@ -68,7 +68,7 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
     {
         val blockResponse = getBlock(blockHeight)
         val indexerDao = IndexerDao(con, lang)
-        if(indexerDao.hasBlock(blockHeight)){
+        if(!indexerDao.hasBlock(blockHeight)){
             indexerDao.insertBlock(blockHeight)
         }
         for(transaction in blockResponse.result.tx)
@@ -115,11 +115,8 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
                     val amountValue = LowLevelUtils.hex2Int(amount)
                     val txHash = notification.state.value[4].value
                     val changeAmount = notification.state.value[5].value
-                    var changeValue = 0
-                    if(changeAmount.length > 0)
-                    {
-                        changeValue = LowLevelUtils.hex2Int(changeAmount)
-                    }
+                    var changeValue = LowLevelUtils.hex2Int(changeAmount)
+
                     var changeTxHash  = ""
                     if(notification.state.value.size > 6) {
                         changeTxHash = notification.state.value[6].value

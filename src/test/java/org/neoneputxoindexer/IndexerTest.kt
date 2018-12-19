@@ -20,6 +20,7 @@ class IndexerTest : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
         con = getConnection()
         val lang = EnglishLanguage()
         subject = IndexerProcess(con, lang)
+        subject.indexBlock(1)
     }
 
     @Test
@@ -81,6 +82,7 @@ class IndexerTest : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
     fun testIndexBlock()
     {
         subject.indexBlock(11689)
+        con.commit()
     }
 
 
