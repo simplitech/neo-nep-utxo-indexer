@@ -29,7 +29,7 @@ class Router : RouterWrapper() {
     @GET
     @Path("/TransferHistory")
     @ApiOperation(value = "List Transfer Information")
-    fun listAsset(
+    fun listTransfers(
         @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en, pt")
             lang: String,
         @HeaderParam("X-Client-Version") @ApiParam(required = true, example = "w1.1.0")
@@ -48,6 +48,34 @@ class Router : RouterWrapper() {
         startDate: Date?,
         @QueryParam("endDate") @ApiParam(value = "Ending in", defaultValue = "2018-10-25")
         endDate: Date?
+    ): PagedResp<TransferTransaction> {
+        return transacPipe.handle {
+            con -> IndexerProcess(con, getLang(lang)).listTransferTransactions(query, page, limit, orderRequest, startDate, endDate, asc);
+        }
+    }
+
+    @GET
+    @Path("/TransferHistoryChart")
+    @ApiOperation(value = "List Transfer Information")
+    fun countTransactions(
+            @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en, pt")
+            lang: String,
+            @HeaderParam("X-Client-Version") @ApiParam(required = true, example = "w1.1.0")
+            clientVersion: String,
+            @QueryParam("masterAccount") @ApiParam(value = "Query of search")
+            query: String?,
+            @QueryParam("page") @ApiParam(value = "Page index, null to not paginate")
+            page: Int?,
+            @QueryParam("limit") @ApiParam(value = "Page size, null to not paginate")
+            limit: Int?,
+            @QueryParam("orderBy") @ApiParam(value = "Identifier for sorting, usually a property name", example = "transactionHash")
+            orderRequest: String?,
+            @QueryParam("ascending") @ApiParam(value = "True for ascending order", defaultValue = "false")
+            asc: Boolean?,
+            @QueryParam("startDate") @ApiParam(value = "Starting from", defaultValue = "2018-10-19")
+            startDate: Date?,
+            @QueryParam("endDate") @ApiParam(value = "Ending in", defaultValue = "2018-10-25")
+            endDate: Date?
     ): PagedResp<TransferTransaction> {
         return transacPipe.handle {
             con -> IndexerProcess(con, getLang(lang)).listTransferTransactions(query, page, limit, orderRequest, startDate, endDate, asc);
