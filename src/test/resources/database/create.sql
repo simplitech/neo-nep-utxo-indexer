@@ -7,12 +7,8 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema neoindexer
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `neoindexer` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `neoIndexer` DEFAULT CHARACTER SET utf8 ;
 USE `neoIndexer` ;
-
-
-
-
 
 -- -----------------------------------------------------
 -- Table `neoIndexer`.`mint_history`
@@ -20,7 +16,7 @@ USE `neoIndexer` ;
 DROP TABLE IF EXISTS `neoIndexer`.`mint_history` ;
 
 CREATE TABLE IF NOT EXISTS `neoIndexer`.`mint_history` (
-  `idMintPk` INT NOT NULL,
+  `idMintPk` INT NOT NULL AUTO_INCREMENT,
   `masterAccount` VARCHAR(255) NULL,
   `recipient` VARCHAR(255) NULL,
   `amount` INT NULL,
@@ -39,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`block` (
   `height` INT NOT NULL,
   `dateTime` DATETIME NOT NULL,
   PRIMARY KEY (`idBlockPk`),
-  UNIQUE INDEX `height_UNIQUE` (`height` ASC) VISIBLE)
+  UNIQUE INDEX `height_UNIQUE` (`height` ASC))
 ENGINE = InnoDB;
 
 
@@ -49,11 +45,11 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `neoIndexer`.`transactions` ;
 
 CREATE TABLE IF NOT EXISTS `neoIndexer`.`transactions` (
-  `idTransactionPk` INT NOT NULL,
+  `idTransactionPk` INT NOT NULL AUTO_INCREMENT,
   `invocationTransactionHash` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
   PRIMARY KEY (`idTransactionPk`),
-  INDEX `fk_transaction_block_idx` (`idBlockFk` ASC) VISIBLE,
+  INDEX `fk_transaction_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_transaction_block`
     FOREIGN KEY (`idBlockFk`)
     REFERENCES `neoIndexer`.`block` (`height`)
@@ -72,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`master_registration_history` (
   `masterAccount` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
   PRIMARY KEY (`idMasterRegistrationPk`),
-  INDEX `fk_master_registration_block_idx` (`idBlockFk` ASC) VISIBLE,
+  INDEX `fk_master_registration_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_master_registration_block`
     FOREIGN KEY (`idBlockFk`)
     REFERENCES `neoIndexer`.`block` (`height`)
@@ -93,8 +89,8 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`account_approvals_history` (
   `regularAccount` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
   PRIMARY KEY (`idApprovalPk`),
-  UNIQUE INDEX `idApprovalPk_UNIQUE` (`idApprovalPk` ASC) VISIBLE,
-  INDEX `fk_approval_block_idx` (`idBlockFk` ASC) VISIBLE,
+  UNIQUE INDEX `idApprovalPk_UNIQUE` (`idApprovalPk` ASC),
+  INDEX `fk_approval_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_approval_block`
     FOREIGN KEY (`idBlockFk`)
     REFERENCES `neoIndexer`.`block` (`height`)
@@ -110,11 +106,11 @@ DEFAULT CHARACTER SET = utf8;
 DROP TABLE IF EXISTS `neoindexer`.`account_registration_history` ;
 
 CREATE TABLE IF NOT EXISTS `neoindexer`.`account_registration_history` (
-  `idAccountRegistrationHistoryPk` INT(11) NOT NULL,
+  `idAccountRegistrationHistoryPk` INT(11) NOT NULL AUTO_INCREMENT,
   `accountAddress` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
   PRIMARY KEY (`idAccountRegistrationHistoryPk`),
-  INDEX `fk_account_registration_block_idx` (`idBlockFk` ASC) VISIBLE,
+  INDEX `fk_account_registration_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_account_registration_block`
     FOREIGN KEY (`idBlockFk`)
     REFERENCES `neoIndexer`.`block` (`height`)
@@ -131,16 +127,16 @@ DEFAULT CHARACTER SET = utf8;
 DROP TABLE IF EXISTS `neoindexer`.`transaction_mint_history` ;
 
 CREATE TABLE IF NOT EXISTS `neoindexer`.`transaction_mint_history` (
-  `idTransactionPk` INT(11) NOT NULL,
+  `idTransactionPk` INT(11) NOT NULL AUTO_INCREMENT,
   `transactionHash` VARCHAR(255) NOT NULL,
   `masterAccount` VARCHAR(255) NOT NULL,
   `amount` INT(11) NOT NULL,
   `recipient` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
   PRIMARY KEY (`idTransactionPk`),
-  UNIQUE INDEX `idTransactionPk_UNIQUE` (`idTransactionPk` ASC) VISIBLE,
-  UNIQUE INDEX `transactionHash_UNIQUE` (`transactionHash` ASC) VISIBLE,
-  INDEX `fk_mint_block_idx` (`idBlockFk` ASC) VISIBLE,
+  UNIQUE INDEX `idTransactionPk_UNIQUE` (`idTransactionPk` ASC),
+  UNIQUE INDEX `transactionHash_UNIQUE` (`transactionHash` ASC),
+  INDEX `fk_mint_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_mint_block`
     FOREIGN KEY (`idBlockFk`)
     REFERENCES `neoIndexer`.`block` (`height`)
@@ -156,7 +152,7 @@ DEFAULT CHARACTER SET = utf8;
 DROP TABLE IF EXISTS `neoindexer`.`transfer_history` ;
 
 CREATE TABLE IF NOT EXISTS `neoindexer`.`transfer_history` (
-  `idTransferPk` INT(11) NOT NULL,
+  `idTransferPk` INT(11) NOT NULL AUTO_INCREMENT,
   `transactionHash` VARCHAR(255) NOT NULL,
   `sender` VARCHAR(255) NOT NULL,
   `recipient` VARCHAR(255) NOT NULL,
@@ -165,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`transfer_history` (
   `idBlockFk` INT NOT NULL,
   `amount` INT NOT NULL,
   PRIMARY KEY (`idTransferPk`),
-  INDEX `fk_transfer_block_idx` (`idBlockFk` ASC) VISIBLE,
+  INDEX `fk_transfer_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_transfer_block`
     FOREIGN KEY (`idBlockFk`)
     REFERENCES `neoIndexer`.`block` (`height`)
