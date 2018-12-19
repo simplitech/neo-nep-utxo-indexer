@@ -9,38 +9,30 @@ import java.util.*
 
 class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
     fun hasTransaction(transactionHash: String): Boolean {
-        return  exist("SELECT invocationTransactionHash FROM transaction WHERE invocationTransactionHash = ?", transactionHash)
+        return  exist("SELECT invocationTransactionHash FROM transactions WHERE invocationTransactionHash = ?", transactionHash)
     }
 
-    fun insertNewRegularAccount(scriptHash: String) {
-       update("INSERT INTO account_registration_history (accountAddress, registrationDate) VALUES (?, NOW())", scriptHash)
+    fun insertNewRegularAccount(scriptHash: String, block: Int) {
+       update("INSERT INTO account_registration_history (accountAddress, idBlockFk) VALUES (?, ?)", scriptHash, block)
     }
 
-    fun insertTransaction(transactionHash: String) {
-        update("INSERT INTO transaction (invocationTransactionHash) VALUES (?)", transactionHash)
+    fun insertTransaction(transactionHash: String, block: Int) {
+        update("INSERT INTO transactions (invocationTransactionHash, idBlockFk) VALUES (?, ?)", transactionHash, block)
     }
 
-    fun insertMint(masterAccount: String, mintAmount: Int, recipient: String, txHash: String) {
-        update("INSERT INTO transaction_mint_history (transactionHash, masterAccount, amount, recipient, dateTime) VALUES (?,?,?,?,NOW())",
-                txHash, masterAccount, mintAmount, recipient)
+    fun insertMint(masterAccount: String, mintAmount: Int, recipient: String, txHash: String, block: Int) {
+        update("INSERT INTO transaction_mint_history (transactionHash, masterAccount, amount, recipient, idBlockFk) VALUES (?,?,?,?,?)",
+                txHash, masterAccount, mintAmount, recipient, block)
     }
 
-    fun insertMasterAccount(masterAccount: String) {
-        update("INSERT INTO master_registration_history (masterAccount, dateTime) VALUES (?, NOW())", masterAccount)
+    fun insertMasterAccount(masterAccount: String, block: Int) {
+        update("INSERT INTO master_registration_history (masterAccount, idBlockFk) VALUES (?, ?)", masterAccount, block)
     }
 
-    fun insertRegularAccountApproval(masterAccount: String, regularAccount: String) {
-        update("INSERT INTO account_approvals_history  (masterAccount, regularAccount, dateTime) VALUES (?, ?, NOW())", masterAccount, regularAccount)
+    fun insertRegularAccountApproval(masterAccount: String, regularAccount: String, block: Int) {
+        update("INSERT INTO account_approvals_history  (masterAccount, regularAccount, idBlockFk) VALUES (?, ?, ?)", masterAccount, regularAccount, block)
     }
 
-
-    fun count(): Int? {
-        //TODO: review generated method
-        return selectFirstInt("""
-            SELECT COUNT(idAdminPk)
-            FROM admin
-            """)
-    }
 
     fun countTransferTransactions(startDate: Date?, endDate: Date?): Int? {
         return selectFirstInt("""
@@ -105,5 +97,18 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
             ${(if (orderColumn != null && asc != null) "ORDER BY " + orderColumn + " " + (if (asc) "ASC " else "DESC ") else "")}
             $limitQuery
             """, { rs -> TransferTransaction.buildAll(rs) }, *params.toTypedArray())
+    }
+
+    fun insertTransferTransaction(from: String, to: String, amountValue: Int, txHash: String, changeValue: Int, changeTxHash: String, blockHeight: Int) {
+        update("INSERT INTO transfer_history (transactionHash, sender, recipient, amount, changeAmount, changeTransactionHash, idBlockFk) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)", txHash, from, to, amountValue, changeValue, changeTxHash, blockHeight)
+    }
+
+    fun hasBlock(blockHeight: Int): Boolean {
+        return  exist("SELECT idBlockPk FROM block WHERE height = ?", blockHeight)
+    }
+
+    fun insertBlock(blockHeight: Int) {
+        update("INSERT INTO block (height, dateTime) VALUES (?, NOW())", blockHeight)
     }
 }

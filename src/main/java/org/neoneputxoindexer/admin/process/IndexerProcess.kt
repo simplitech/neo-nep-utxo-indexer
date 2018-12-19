@@ -43,7 +43,7 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
         return notBase;
     }
 
-    fun handleNotification(notificationResponse: ApplicationLogsRpcResponse) : String
+    fun handleNotification(notificationResponse: ApplicationLogsRpcResponse, blockHeight: Int) : String
     {
         if(!notificationResponse.result.notifications.isEmpty())
         {
@@ -55,49 +55,79 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
                 {
                     val notificationName = LowLevelUtils.hex2str(firstNotificationType.value)
 
-                    handleNotification(notificationName, firstNotification, notificationResponse.result.txid)
+                    handleNotification(notificationName, firstNotification, notificationResponse.result.txid, blockHeight)
                     return notificationName
                 }
             }
         }
+
         return ""
     }
 
-    fun handleNotification(notificationName : String, notification: Notification, transactionHash: String)
+    fun indexBlock(blockHeight: Int)
     {
+        val blockResponse = getBlock(blockHeight)
         val indexerDao = IndexerDao(con, lang)
+        if(indexerDao.hasBlock(blockHeight)){
+            indexerDao.insertBlock(blockHeight)
+        }
+        for(transaction in blockResponse.result.tx)
+        {
+            val notificationResp = getNotifications(transaction.txid)
+            handleNotification(notificationResp, blockHeight)
+        }
+
+    }
+
+    fun handleNotification(notificationName : String, notification: Notification, transactionHash: String, blockHeight: Int)
+    {
+
+        val indexerDao = IndexerDao(con, lang)
+
         if (!indexerDao.hasTransaction(transactionHash))
         {
             when (notificationName) {
                 "newRegularAccount" -> {
                     val accountName = notification.state.value[1]
-                    indexerDao.insertNewRegularAccount(accountName.value)
+                    indexerDao.insertNewRegularAccount(accountName.value, blockHeight)
                 }
                 "mint" -> {
-                    val masterAccount = notification.state.value[1]
-                    val amount = notification.state.value[2]
-                    val amountValue = LowLevelUtils.hex2Int(amount.value)
-                    val recipient = notification.state.value[3]
-                    val txHash = notification.state.value[4]
-                    indexerDao.insertMint(masterAccount.value, amountValue, recipient.value, txHash.value)
+                    val masterAccount = notification.state.value[1].value
+                    val amount = notification.state.value[2].value
+                    val amountValue = LowLevelUtils.hex2Int(amount)
+                    val recipient = notification.state.value[3].value
+                    val txHash = notification.state.value[4].value
+                    indexerDao.insertMint(masterAccount, amountValue, recipient, txHash, blockHeight)
                 }
                 "newMasterAccount" -> {
-                    val masterAccount = notification.state.value[1]
-                    indexerDao.insertMasterAccount(masterAccount.value)
+                    val masterAccount = notification.state.value[1].value
+                    indexerDao.insertMasterAccount(masterAccount, blockHeight)
                 }
                 "regularAccountApproved" -> {
-                    val masterAccount = notification.state.value[1]
-                    val regularAccount = notification.state.value[2]
-                    indexerDao.insertRegularAccountApproval(masterAccount.value, regularAccount.value)
+                    val masterAccount = notification.state.value[1].value
+                    val regularAccount = notification.state.value[2].value
+                    indexerDao.insertRegularAccountApproval(masterAccount, regularAccount, blockHeight)
                 }
                 "transferTransactions" -> {
-                    val sender = notification.state.value[1]
-                    val recipient = notification.state.value[2]
-                    val txHash = notification.state.value[3]
-
+                    val from = notification.state.value[1].value
+                    val to = notification.state.value[2].value
+                    val amount = notification.state.value[3].value
+                    val amountValue = LowLevelUtils.hex2Int(amount)
+                    val txHash = notification.state.value[4].value
+                    val changeAmount = notification.state.value[5].value
+                    var changeValue = 0
+                    if(changeAmount.length > 0)
+                    {
+                        changeValue = LowLevelUtils.hex2Int(changeAmount)
+                    }
+                    var changeTxHash  = ""
+                    if(notification.state.value.size > 6) {
+                        changeTxHash = notification.state.value[6].value
+                    }
+                    indexerDao.insertTransferTransaction(from, to, amountValue, txHash, changeValue, changeTxHash, blockHeight)
                 }
             }
-            indexerDao.insertTransaction(transactionHash)
+            indexerDao.insertTransaction(transactionHash, blockHeight)
         }
     }
 

@@ -10,7 +10,7 @@ class Block {
 
 class Transaction
 {
-    val txId = ""
+    val txid = ""
     val type = ""
     val script = ""
 }

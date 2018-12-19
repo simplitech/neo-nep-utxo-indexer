@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`transactions` (
   INDEX `fk_transaction_block_idx` (`idBlockFk` ASC) VISIBLE,
   CONSTRAINT `fk_transaction_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`master_registration_history` (
   INDEX `fk_master_registration_block_idx` (`idBlockFk` ASC) VISIBLE,
   CONSTRAINT `fk_master_registration_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`account_approvals_history` (
   INDEX `fk_approval_block_idx` (`idBlockFk` ASC) VISIBLE,
   CONSTRAINT `fk_approval_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`account_registration_history` (
   INDEX `fk_account_registration_block_idx` (`idBlockFk` ASC) VISIBLE,
   CONSTRAINT `fk_account_registration_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`transaction_mint_history` (
   INDEX `fk_mint_block_idx` (`idBlockFk` ASC) VISIBLE,
   CONSTRAINT `fk_mint_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`transfer_history` (
   INDEX `fk_transfer_block_idx` (`idBlockFk` ASC) VISIBLE,
   CONSTRAINT `fk_transfer_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

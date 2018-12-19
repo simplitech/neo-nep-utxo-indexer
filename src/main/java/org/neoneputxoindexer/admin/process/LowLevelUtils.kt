@@ -20,6 +20,11 @@ object LowLevelUtils {
     }
 
     fun hex2Int(input: String): Int {
+        //TODO INCORRECT.
+        if(input.length == 1)
+        {
+            return  input.toInt()
+        }
         var reversed = LowLevelUtils.reverseHex(input)
         val amountBytes = Hex.decodeHex(reversed.toCharArray())
         return BigInteger(amountBytes).intValueExact()
