@@ -2,14 +2,13 @@ package org.neoneputxoindexer.admin.process
 
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.model.PagedResp
+import com.google.common.base.Strings
 import com.google.gson.Gson
 import java.net.URL
 import java.sql.Connection
-import org.apache.commons.codec.binary.Hex
 import org.neoneputxoindexer.dao.IndexerDao
 import org.neoneputxoindexer.model.*
-import java.math.BigInteger
-import java.nio.ByteBuffer
+
 
 
 class IndexerProcess(private val con: Connection, private val lang: LanguageHolder) {
@@ -122,59 +121,39 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
     }
 
 
+    fun listTransferTransactions(
+            queryP: String?,
+            page: Int?,
+            limit: Int?,
+            orderRequest: String?,
+            startDate: java.util.Date?,
+            endDate: java.util.Date?,
+            asc: Boolean?): PagedResp<TransferTransaction> {
+        var query = queryP
 
-    fun testFunction() : PagedResp<MintHistoryItem>
-    {
-        return PagedResp();
+        if (query != null) {
+            query = query.replace("[.,:\\-\\/]".toRegex(), "")
+        }
+
+        val dao = IndexerDao(con, lang)
+
+        val listTransferTransactions : List<TransferTransaction> = dao.listTransferTransactions(startDate, endDate, query, page, limit, orderRequest, asc)
+
+        val resp = PagedResp(listTransferTransactions)
+
+        if (!Strings.isNullOrEmpty(query)) {
+            dao.countTransferTransactions(startDate, endDate, query)?.let {
+                count -> resp.recordsTotal = count
+            }
+        } else {
+            dao.countTransferTransactions(startDate, endDate)?.let{
+                count -> resp.recordsTotal = count
+            }
+        }
+
+        return resp
     }
 
 
-//    fun getOne(idAdminPk: Long?): AdminResp {
-//        //TODO: review generated method
-//        val adminDao = AdminDao(con, lang)
-//
-//        val resp = AdminResp()
-//
-//        if (idAdminPk != null && idAdminPk > 0L) {
-//            val admin = adminDao.getOne(idAdminPk)
-//            resp.admin = admin
-//        }
-//
-//
-//        return resp
-//    }
-
-
-//    fun list(
-//            queryP: String?,
-//            page: Int?,
-//            limit: Int?,
-//            orderRequest: String?,
-//            asc: Boolean?): PagedResp<Admin> {
-//        //TODO: review generated method
-//        var query = queryP
-//
-//        if (query != null) {
-//            query = query.replace("[.,:\\-\\/]".toRegex(), "")
-//        }
-//
-//        val dao = AdminDao(con, lang)
-//
-//        val listAdmin = dao.list(query, page, limit, orderRequest, asc)
-//
-//        val resp = PagedResp(listAdmin)
-//
-//        if (!Strings.isNullOrEmpty(query)) {
-//            dao.count(query)?.let {
-//                count -> resp.recordsTotal = count
-//            }
-//        } else {
-//            dao.count()?.let{
-//                count -> resp.recordsTotal = count
-//            }
-//        }
-//
-//        return resp
-//    }
 
 }

@@ -2,118 +2,177 @@
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema neoIndexer
+-- Schema neoindexer
 -- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema neoIndexer
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `neoIndexer` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `neoindexer` DEFAULT CHARACTER SET utf8 ;
 USE `neoIndexer` ;
 
+
+
+
+
 -- -----------------------------------------------------
--- Table `neoIndexer`.`admin`
+-- Table `neoIndexer`.`mint_history`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `neoIndexer`.`admin` (
-  `idAdminPk` INT NOT NULL AUTO_INCREMENT,
-  `email` VARCHAR(255) NOT NULL,
-  `password` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`idAdminPk`))
-  ENGINE = InnoDB;
+DROP TABLE IF EXISTS `neoIndexer`.`mint_history` ;
+
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`mint_history` (
+  `idMintPk` INT NOT NULL,
+  `masterAccount` VARCHAR(255) NULL,
+  `recipient` VARCHAR(255) NULL,
+  `amount` INT NULL,
+  `transactionHash` VARCHAR(255) NULL,
+  PRIMARY KEY (`idMintPk`))
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `neoIndexer`.`block`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `neoIndexer`.`block` ;
+
 CREATE TABLE IF NOT EXISTS `neoIndexer`.`block` (
   `idBlockPk` INT NOT NULL AUTO_INCREMENT,
   `height` INT NOT NULL,
-  `hash` INT NOT NULL,
-  `creationDate` INT NOT NULL,
-  `sizeInBytes` INT NOT NULL,
-  PRIMARY KEY (`idBlockPk`))
-  ENGINE = InnoDB;
+  `dateTime` DATETIME NOT NULL,
+  PRIMARY KEY (`idBlockPk`),
+  UNIQUE INDEX `height_UNIQUE` (`height` ASC) VISIBLE)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `neoIndexer`.`transaction_type`
+-- Table `neoIndexer`.`transactions`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `neoIndexer`.`transaction_type` (
-  `idTransactionTypePk` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`idTransactionTypePk`))
-  ENGINE = InnoDB;
+DROP TABLE IF EXISTS `neoIndexer`.`transactions` ;
 
-
--- -----------------------------------------------------
--- Table `neoIndexer`.`transaction`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `neoIndexer`.`transaction` (
-  `idTransactionPk` INT NOT NULL AUTO_INCREMENT,
-  `hash` VARCHAR(255) NOT NULL,
-  `idTypeFk` INT NOT NULL,
-  `from` VARCHAR(255) NOT NULL,
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`transactions` (
+  `idTransactionPk` INT NOT NULL,
+  `invocationTransactionHash` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
   PRIMARY KEY (`idTransactionPk`),
-  INDEX `idBlockFk_idx` (`idBlockFk` ASC),
-  INDEX `idTypeFk_idx` (`idTypeFk` ASC),
-  CONSTRAINT `idBlockFk`
-  FOREIGN KEY (`idBlockFk`)
-  REFERENCES `neoIndexer`.`block` (`idBlockPk`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `idTypeFk`
-  FOREIGN KEY (`idTypeFk`)
-  REFERENCES `neoIndexer`.`transaction_type` (`idTransactionTypePk`)
+  INDEX `fk_transaction_block_idx` (`idBlockFk` ASC) VISIBLE,
+  CONSTRAINT `fk_transaction_block`
+    FOREIGN KEY (`idBlockFk`)
+    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `neoIndexer`.`asset`
+-- Table `neoIndexer`.`master_registration_history`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `neoIndexer`.`asset` (
-  `idAssetPk` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL,
-  PRIMARY KEY (`idAssetPk`))
-  ENGINE = InnoDB;
+DROP TABLE IF EXISTS `neoIndexer`.`master_registration_history` ;
+
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`master_registration_history` (
+  `idMasterRegistrationPk` INT NOT NULL AUTO_INCREMENT,
+  `masterAccount` VARCHAR(255) NOT NULL,
+  `idBlockFk` INT NOT NULL,
+  PRIMARY KEY (`idMasterRegistrationPk`),
+  INDEX `fk_master_registration_block_idx` (`idBlockFk` ASC) VISIBLE,
+  CONSTRAINT `fk_master_registration_block`
+    FOREIGN KEY (`idBlockFk`)
+    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+USE `neoindexer` ;
+
+-- -----------------------------------------------------
+-- Table `neoindexer`.`account_approvals_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `neoindexer`.`account_approvals_history` ;
+
+CREATE TABLE IF NOT EXISTS `neoindexer`.`account_approvals_history` (
+  `idApprovalPk` INT(11) NOT NULL AUTO_INCREMENT,
+  `masterAccount` VARCHAR(255) NOT NULL,
+  `regularAccount` VARCHAR(255) NOT NULL,
+  `idBlockFk` INT NOT NULL,
+  PRIMARY KEY (`idApprovalPk`),
+  UNIQUE INDEX `idApprovalPk_UNIQUE` (`idApprovalPk` ASC) VISIBLE,
+  INDEX `fk_approval_block_idx` (`idBlockFk` ASC) VISIBLE,
+  CONSTRAINT `fk_approval_block`
+    FOREIGN KEY (`idBlockFk`)
+    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `neoIndexer`.`transaction_input`
+-- Table `neoindexer`.`account_registration_history`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `neoIndexer`.`transaction_input` (
-  `idTransactionInputPk` INT NOT NULL AUTO_INCREMENT,
-  `previousIdTransactionFk` INT NULL,
-  `idTransactionFk` INT NOT NULL,
+DROP TABLE IF EXISTS `neoindexer`.`account_registration_history` ;
+
+CREATE TABLE IF NOT EXISTS `neoindexer`.`account_registration_history` (
+  `idAccountRegistrationHistoryPk` INT(11) NOT NULL,
+  `accountAddress` VARCHAR(255) NOT NULL,
+  `idBlockFk` INT NOT NULL,
+  PRIMARY KEY (`idAccountRegistrationHistoryPk`),
+  INDEX `fk_account_registration_block_idx` (`idBlockFk` ASC) VISIBLE,
+  CONSTRAINT `fk_account_registration_block`
+    FOREIGN KEY (`idBlockFk`)
+    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+
+-- -----------------------------------------------------
+-- Table `neoindexer`.`transaction_mint_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `neoindexer`.`transaction_mint_history` ;
+
+CREATE TABLE IF NOT EXISTS `neoindexer`.`transaction_mint_history` (
+  `idTransactionPk` INT(11) NOT NULL,
+  `transactionHash` VARCHAR(255) NOT NULL,
+  `masterAccount` VARCHAR(255) NOT NULL,
+  `amount` INT(11) NOT NULL,
+  `recipient` VARCHAR(255) NOT NULL,
+  `idBlockFk` INT NOT NULL,
+  PRIMARY KEY (`idTransactionPk`),
+  UNIQUE INDEX `idTransactionPk_UNIQUE` (`idTransactionPk` ASC) VISIBLE,
+  UNIQUE INDEX `transactionHash_UNIQUE` (`transactionHash` ASC) VISIBLE,
+  INDEX `fk_mint_block_idx` (`idBlockFk` ASC) VISIBLE,
+  CONSTRAINT `fk_mint_block`
+    FOREIGN KEY (`idBlockFk`)
+    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `neoindexer`.`transfer_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `neoindexer`.`transfer_history` ;
+
+CREATE TABLE IF NOT EXISTS `neoindexer`.`transfer_history` (
+  `idTransferPk` INT(11) NOT NULL,
+  `transactionHash` VARCHAR(255) NOT NULL,
+  `sender` VARCHAR(255) NOT NULL,
+  `recipient` VARCHAR(255) NOT NULL,
+  `changeAmount` INT(11) NOT NULL,
+  `changeTransactionHash` VARCHAR(255) NULL DEFAULT NULL,
+  `idBlockFk` INT NOT NULL,
   `amount` INT NOT NULL,
-  `spent` TINYINT(1) NOT NULL,
-  `to` VARCHAR(255) NOT NULL,
-  `idAssetFk` INT NULL,
-  PRIMARY KEY (`idTransactionInputPk`),
-  INDEX `previousIdTransactionFk_idx` (`previousIdTransactionFk` ASC),
-  INDEX `idTransactionFk_idx` (`idTransactionFk` ASC),
-  INDEX `fk_idAssetFk_idx` (`idAssetFk` ASC),
-  CONSTRAINT `fk_previousIdTransactionFk`
-  FOREIGN KEY (`previousIdTransactionFk`)
-  REFERENCES `neoIndexer`.`transaction` (`idTransactionPk`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_idTransactionFk`
-  FOREIGN KEY (`idTransactionFk`)
-  REFERENCES `neoIndexer`.`transaction` (`idTransactionPk`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_idAssetFk`
-  FOREIGN KEY (`idAssetFk`)
-  REFERENCES `neoIndexer`.`asset` (`idAssetPk`)
+  PRIMARY KEY (`idTransferPk`),
+  INDEX `fk_transfer_block_idx` (`idBlockFk` ASC) VISIBLE,
+  CONSTRAINT `fk_transfer_block`
+    FOREIGN KEY (`idBlockFk`)
+    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

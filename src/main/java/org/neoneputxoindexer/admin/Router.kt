@@ -14,6 +14,8 @@ import io.swagger.annotations.ApiParam
 import org.neoneputxoindexer.admin.process.IndexerProcess
 
 import org.neoneputxoindexer.model.MintHistoryItem
+import org.neoneputxoindexer.model.TransferTransaction
+import java.util.*
 
 /**
  * Routes of Admin module
@@ -25,8 +27,8 @@ import org.neoneputxoindexer.model.MintHistoryItem
 class Router : RouterWrapper() {
 
     @GET
-    @Path("/MintHistory")
-    @ApiOperation(value = "List Asset information")
+    @Path("/TransferHistory")
+    @ApiOperation(value = "List Transfer Information")
     fun listAsset(
         @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en, pt")
             lang: String,
@@ -38,13 +40,17 @@ class Router : RouterWrapper() {
             page: Int?,
         @QueryParam("limit") @ApiParam(value = "Page size, null to not paginate")
             limit: Int?,
-        @QueryParam("orderBy") @ApiParam(value = "Identifier for sorting, usually a property name", example = "idGrupoDoPrincipalFk")
+        @QueryParam("orderBy") @ApiParam(value = "Identifier for sorting, usually a property name", example = "transactionHash")
             orderRequest: String?,
         @QueryParam("ascending") @ApiParam(value = "True for ascending order", defaultValue = "false")
-            asc: Boolean?
-    ): PagedResp<MintHistoryItem> {
+        asc: Boolean?,
+        @QueryParam("startDate") @ApiParam(value = "Starting from", defaultValue = "2018-10-19")
+        startDate: Date?,
+        @QueryParam("endDate") @ApiParam(value = "Ending in", defaultValue = "2018-10-25")
+        endDate: Date?
+    ): PagedResp<TransferTransaction> {
         return transacPipe.handle {
-            con -> IndexerProcess(con, getLang(lang)).testFunction();
+            con -> IndexerProcess(con, getLang(lang)).listTransferTransactions(query, page, limit, orderRequest, startDate, endDate, asc);
         }
     }
 
