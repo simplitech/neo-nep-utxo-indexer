@@ -74,6 +74,7 @@ class Router : RouterWrapper() {
 
     @GET
     @Path("/SchedulerRun")
+    @ApiOperation(value = "Runs the scheduler")
     fun runIndexer(): Boolean {
         return transacPipe.handle {
             con -> IndexerProcess(con, getLang()).schedulerRun()
