@@ -3,6 +3,7 @@ package org.neoneputxoindexer
 import br.com.simpli.model.EnglishLanguage
 import br.com.simpli.sql.DaoTest
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import org.neoneputxoindexer.admin.process.IndexerProcess
 import java.sql.Connection
@@ -23,6 +24,7 @@ class IndexerTest : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
         subject.indexBlock(1)
     }
 
+    @Ignore
     @Test
     fun  testIsOurAppCall()
     {

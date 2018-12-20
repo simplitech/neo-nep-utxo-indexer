@@ -15,6 +15,7 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
 
     val apiPrefix = "http://chain.simpli.com.br:30333?jsonrpc=2.0"
     val urlRpcGetBlock = apiPrefix.plus("&method=getblock&params=")
+    val urlRpcGetBlockHeight = apiPrefix.plus("&method=getblockcount")
     val urlRpcGetApplicationLogs = apiPrefix.plus("&method=getapplicationlog&params=")
     val reversedScriptHash = "64422bb356c39d8b3680116622b906e94c2cea1c";//Reverse your script hash here: neocompiler.io/#/ecolab/ ('conversors')
     var gson = Gson()
@@ -34,6 +35,13 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
         val apiResponse = URL(rpcGetBlock(block)).readText()
         val notBase = gson.fromJson(apiResponse, BlockRpcResponse::class.java);
         return notBase;
+    }
+
+    fun getBlockHeight() : BlockRpcResponse
+    {
+        val apiResponse = URL(urlRpcGetBlockHeight).readText()
+        val notBase = gson.fromJson(apiResponse, BlockRpcResponse::class.java)
+        return notBase
     }
 
     fun getNotifications(txHash: String) : ApplicationLogsRpcResponse
@@ -190,6 +198,13 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
         return dao.getTransactionStats(startDate, endDate)
     }
 
+    fun schedulerRun() {
+        // pegar o maior blockheight no banco de dados
+
+        // pegar o blockheight no blockchain
+
+        //
+    }
 
 
 }
