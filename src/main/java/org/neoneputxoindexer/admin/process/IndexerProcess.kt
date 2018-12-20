@@ -8,7 +8,7 @@ import java.net.URL
 import java.sql.Connection
 import org.neoneputxoindexer.dao.IndexerDao
 import org.neoneputxoindexer.model.*
-
+import java.util.*
 
 
 class IndexerProcess(private val con: Connection, private val lang: LanguageHolder) {
@@ -148,13 +148,13 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
     }
 
 
-    fun listTransferTransactions(
+    fun listTransactions(
             queryP: String?,
             page: Int?,
             limit: Int?,
             orderRequest: String?,
-            startDate: java.util.Date?,
-            endDate: java.util.Date?,
+            startDate: Date?,
+            endDate: Date?,
             asc: Boolean?): PagedResp<TransferTransaction> {
         var query = queryP
 
@@ -179,6 +179,15 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
         }
 
         return resp
+    }
+
+    fun getTransactionsStats(
+            startDate: Date?,
+            endDate: Date?): List<TransactionStats> {
+
+        val dao = IndexerDao(con, lang)
+
+        return dao.getTransactionStats(startDate, endDate)
     }
 
 

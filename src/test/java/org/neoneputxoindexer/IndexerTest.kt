@@ -88,6 +88,13 @@ class IndexerTest : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
 
     }
 
+    @Test
+    fun testStatsTransaction()
+    {
+        val result = subject.getTransactionsStats(null, null)
+        Assert.assertNotNull(result)
+    }
+
 
 
 }

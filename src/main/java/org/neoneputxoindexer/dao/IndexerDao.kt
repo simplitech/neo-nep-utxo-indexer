@@ -3,6 +3,7 @@ package org.neoneputxoindexer.dao
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
 import com.google.common.base.Strings
+import org.neoneputxoindexer.model.TransactionStats
 import org.neoneputxoindexer.model.TransferTransaction
 import java.sql.Connection
 import java.util.*
@@ -119,5 +120,42 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
 
     fun insertBlock(blockHeight: Int) {
         update("INSERT INTO block (height, dateTime) VALUES (?, NOW())", blockHeight)
+    }
+
+    fun getTransactionStats(startDate: Date?, endDate: Date?): List<TransactionStats> {
+        val params = ArrayList<Any>()
+        var where = "WHERE 1 = 1 "
+
+        if (startDate != null) {
+            where += " AND dateTime >= ? "
+            params.add(startDate)
+        }
+
+        if (endDate != null) {
+            where += " AND dateTime <= ? "
+            params.add(endDate)
+        }
+
+        return selectList("""
+            SELECT
+
+            DATE(block.dateTime)                                                        AS date,
+            SUM(transfer_history.amount)                                                AS amountSum,
+            COUNT(DISTINCT transfer_history.idTransferPk)                               AS transactionsCount,
+            COUNT(DISTINCT transaction_mint_history.idTransactionPk)                    AS mintTokensCount,
+            COUNT(DISTINCT account_registration_history.idAccountRegistrationHistoryPk) AS regularAccountsCount,
+            COUNT(DISTINCT account_approvals_history.idApprovalPk)                      AS approvedAccountsCount
+
+            FROM block
+
+            LEFT JOIN transfer_history ON transfer_history.idBlockFk                            = block.idBlockPk
+            LEFT JOIN transaction_mint_history ON transaction_mint_history.idBlockFk            = block.idBlockPk
+            LEFT JOIN account_registration_history ON account_registration_history.idBlockFk    = block.idBlockPk
+            LEFT JOIN account_approvals_history ON account_approvals_history.idBlockFk          = block.idBlockPk
+
+            $where
+
+            GROUP BY DATE(block.dateTime)
+            """, { rs -> TransactionStats.buildAll(rs) }, *params.toTypedArray())
     }
 }
