@@ -64,14 +64,14 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`master_registration_history` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-USE `neoindexer` ;
+USE `neoIndexer` ;
 
 -- -----------------------------------------------------
--- Table `neoindexer`.`account_approvals_history`
+-- Table `neoIndexer`.`account_approvals_history`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `neoindexer`.`account_approvals_history` ;
+DROP TABLE IF EXISTS `neoIndexer`.`account_approvals_history` ;
 
-CREATE TABLE IF NOT EXISTS `neoindexer`.`account_approvals_history` (
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`account_approvals_history` (
   `idApprovalPk` INT(11) NOT NULL AUTO_INCREMENT,
   `masterAccount` VARCHAR(255) NOT NULL,
   `regularAccount` VARCHAR(255) NOT NULL,
@@ -89,11 +89,11 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `neoindexer`.`account_registration_history`
+-- Table `neoIndexer`.`account_registration_history`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `neoindexer`.`account_registration_history` ;
+DROP TABLE IF EXISTS `neoIndexer`.`account_registration_history` ;
 
-CREATE TABLE IF NOT EXISTS `neoindexer`.`account_registration_history` (
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`account_registration_history` (
   `idAccountRegistrationHistoryPk` INT(11) NOT NULL AUTO_INCREMENT,
   `accountAddress` VARCHAR(255) NOT NULL,
   `idBlockFk` INT NOT NULL,
@@ -110,11 +110,11 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `neoindexer`.`transaction_mint_history`
+-- Table `neoIndexer`.`transaction_mint_history`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `neoindexer`.`transaction_mint_history` ;
+DROP TABLE IF EXISTS `neoIndexer`.`transaction_mint_history` ;
 
-CREATE TABLE IF NOT EXISTS `neoindexer`.`transaction_mint_history` (
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`transaction_mint_history` (
   `idTransactionPk` INT(11) NOT NULL AUTO_INCREMENT,
   `transactionHash` VARCHAR(255) NOT NULL,
   `masterAccount` VARCHAR(255) NOT NULL,
@@ -135,11 +135,11 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `neoindexer`.`transfer_history`
+-- Table `neoIndexer`.`transfer_history`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `neoindexer`.`transfer_history` ;
+DROP TABLE IF EXISTS `neoIndexer`.`transfer_history` ;
 
-CREATE TABLE IF NOT EXISTS `neoindexer`.`transfer_history` (
+CREATE TABLE IF NOT EXISTS `neoIndexer`.`transfer_history` (
   `idTransferPk` INT(11) NOT NULL AUTO_INCREMENT,
   `transactionHash` VARCHAR(255) NOT NULL,
   `sender` VARCHAR(255) NOT NULL,
