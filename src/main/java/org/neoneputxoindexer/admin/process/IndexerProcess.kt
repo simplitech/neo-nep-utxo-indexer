@@ -198,12 +198,17 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
         return dao.getTransactionStats(startDate, endDate)
     }
 
-    fun schedulerRun() {
+    fun schedulerRun(): Boolean {
         // pegar o maior blockheight no banco de dados
 
         // pegar o blockheight no blockchain
 
-        //
+        for(i in 13690..13737){
+            indexBlock(i)
+            con.commit()
+        }
+
+        return true
     }
 
 

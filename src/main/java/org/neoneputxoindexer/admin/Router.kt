@@ -72,4 +72,12 @@ class Router : RouterWrapper() {
         }
     }
 
+    @GET
+    @Path("/SchedulerRun")
+    fun runIndexer(): Boolean {
+        return transacPipe.handle {
+            con -> IndexerProcess(con, getLang()).schedulerRun()
+        }
+    }
+
 }
