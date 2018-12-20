@@ -81,7 +81,7 @@ class IndexerTest : DaoTest("jdbc/neoIndexerDS", "neoIndexer") {
     @Test
     fun testIndexBlock()
     {
-        for(i in 11870..11880){
+        for(i in 13690..13737){
             subject.indexBlock(i)
             con.commit()
         }

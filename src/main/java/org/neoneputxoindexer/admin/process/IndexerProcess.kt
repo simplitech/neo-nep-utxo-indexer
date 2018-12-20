@@ -16,7 +16,7 @@ class IndexerProcess(private val con: Connection, private val lang: LanguageHold
     val apiPrefix = "http://chain.simpli.com.br:30333?jsonrpc=2.0"
     val urlRpcGetBlock = apiPrefix.plus("&method=getblock&params=")
     val urlRpcGetApplicationLogs = apiPrefix.plus("&method=getapplicationlog&params=")
-    val reversedScriptHash = "b43bc406d44c6db622b2dd2a5ee2cbc5672e4448";//Reverse your script hash here: neocompiler.io/#/ecolab/ ('conversors')
+    val reversedScriptHash = "64422bb356c39d8b3680116622b906e94c2cea1c";//Reverse your script hash here: neocompiler.io/#/ecolab/ ('conversors')
     var gson = Gson()
 
     fun rpcGetBlock(blockHeight : Int) : String

@@ -102,7 +102,7 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
 
         return selectList("""
             SELECT *
-            FROM transfer_history INNER JOIN block ON block.idBlockPk = transfer_history.idBlockFk
+            FROM transfer_history INNER JOIN block ON block.height = transfer_history.idBlockFk
             $where
             ${(if (orderColumn != null && asc != null) "ORDER BY " + orderColumn + " " + (if (asc) "ASC " else "DESC ") else "")}
             $limitQuery
@@ -148,10 +148,10 @@ class IndexerDao (con: Connection, lang: LanguageHolder) : Dao(con, lang){
 
             FROM block
 
-            LEFT JOIN transfer_history ON transfer_history.idBlockFk                            = block.idBlockPk
-            LEFT JOIN transaction_mint_history ON transaction_mint_history.idBlockFk            = block.idBlockPk
-            LEFT JOIN account_registration_history ON account_registration_history.idBlockFk    = block.idBlockPk
-            LEFT JOIN account_approvals_history ON account_approvals_history.idBlockFk          = block.idBlockPk
+            LEFT JOIN transfer_history ON transfer_history.idBlockFk                            = block.height
+            LEFT JOIN transaction_mint_history ON transaction_mint_history.idBlockFk            = block.height
+            LEFT JOIN account_registration_history ON account_registration_history.idBlockFk    = block.height
+            LEFT JOIN account_approvals_history ON account_approvals_history.idBlockFk          = block.height
 
             $where
 

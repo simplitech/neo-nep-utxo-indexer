@@ -3,8 +3,16 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+-- -----------------------------------------------------
+-- Schema apptite
+-- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `neoIndexer` ;
 
-
+-- -----------------------------------------------------
+-- Schema apptite
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `neoIndexer` DEFAULT CHARACTER SET utf8mb4 ;
+USE `neoIndexer` ;
 -- -----------------------------------------------------
 -- Table `neoIndexer`.`block`
 -- -----------------------------------------------------
@@ -32,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`transactions` (
   INDEX `fk_transaction_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_transaction_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -51,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `neoIndexer`.`master_registration_history` (
   INDEX `fk_master_registration_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_master_registration_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -73,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`account_approvals_history` (
   INDEX `fk_approval_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_approval_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -93,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`account_registration_history` (
   INDEX `fk_account_registration_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_account_registration_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -119,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`transaction_mint_history` (
   INDEX `fk_mint_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_mint_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -144,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `neoindexer`.`transfer_history` (
   INDEX `fk_transfer_block_idx` (`idBlockFk` ASC),
   CONSTRAINT `fk_transfer_block`
     FOREIGN KEY (`idBlockFk`)
-    REFERENCES `neoIndexer`.`block` (`idBlockPk`)
+    REFERENCES `neoIndexer`.`block` (`height`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

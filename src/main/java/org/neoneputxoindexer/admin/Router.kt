@@ -21,7 +21,7 @@ import java.util.*
  * Routes of Admin module
  * @author Simpli© CLI generator
  */
-@Path("/Admin")
+@Path("/Indexer")
 @Api()
 @Produces(MediaType.APPLICATION_JSON)
 class Router : RouterWrapper() {
