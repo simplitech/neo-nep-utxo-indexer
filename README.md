@@ -8,4 +8,4 @@ The most important file is the [IndexerProccess](https://github.com/simplitech/n
 
 ## Logs must be enabled
 
-In order for your node to store notifications, the logs plugin must be enabled. In versions prior to 2.9, you need to start the node using `--log` param. For older versions, use the ApplicationLogs plugin describede [here](https://github.com/neo-project/neo-plugins)
+In order for your node to store notifications, the logs plugin must be enabled. In versions prior to 2.9, you need to start the node using `--log` param. For older versions, use the ApplicationLogs plugin described [here](https://github.com/neo-project/neo-plugins)
